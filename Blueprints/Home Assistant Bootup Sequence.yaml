@@ -1,0 +1,14 @@
+blueprint:
+  name: Home Assistant Bootup Sequence
+  description: Fancy Bootup Sequence for Home Assistant
+  domain: automation
+  input:
+    media_player:
+      name: Media Player
+      description: Which media player should we play the bootup sound on?
+      selector:
+        entity:
+          domain: media_player
+    bootsound:
+      name: Boot Sound
+      description: This should be an MP3 Link accessible to your media player.
