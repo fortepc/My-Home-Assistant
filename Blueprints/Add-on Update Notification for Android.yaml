@@ -1,19 +1,35 @@
 blueprint:
-  name: Home Assistant Update Notification for Android
-  description: Send a notification when there's an update availiable for Home Assistant
+  name: HA Addon Update Notification for Android
+  description: Send a notification when there's an update availiable for your one of HA Addons. You will may need to go you your [devices list](https://my.home-assistant.io/redirect/devices/) and enable the sensors for the addon(s) you want an update notifier for.
   domain: automation
   input:
+    addon:
+      name: Add-on Name
+      description: "The name of the Add-on as we're going to use it in the Notification?"
     updater:
-      name: Update sensor
-      description: "The sensor which indicates if there's an update. Default is 'binary_sensor.updater'"
-      default: binary_sensor.updater
+      name: Update Sensor
+      description: "The binary sensor which indicates if there's an update available"
+      selector:
+        entity:
+          domain: binary_sensor
+    version_sensor:
+      name: Version Sensor
+      description: "The binary sensor which indicates if there's an update available"
+      default: sensor.file_editor_version
+      selector:
+        entity:
+          domain: sensor
+    newest_version_sensor:
+      name: New Version Sensor
+      description: "This is the sensor that tells you what the available version is"
+      default: sensor.file_editor_newest_version
       selector:
         entity:
           domain: binary_sensor
     notify_device:
       name: Device to notify
       description:
-        Device needs to run the official Home Assistant app to receive
+        Device needs to run the full official Home Assistant app to receive
         notifications
       selector:
         device:
@@ -21,15 +37,15 @@ blueprint:
     notification_title:
       name: Notification title
       description: 'What would you like to appear as the title of the notification on your device? If you put "{{ newest_version }}" in your message it will be replaced with the actual version number in your notification'
-      default: Upgrade time!
+      default: Update Time!
     notification_message:
       name: Notification message
       description: 'What would you like the message in your notification to be? If you put "{{ newest_version }}" in your message it will be replaced with the actual version number in your notification'
-      default: Home Assistant {{ newest_version }} is available
+      default: {{ addon }} {{ newest_version }} is available
     category:
       name: Notification Category
       description: "Devices running Android 8.0+ are able to create and manage notification channels on the fly. Once a channel is created you can navigate to your notification settings and you will find the newly created channel, from there you can customize the behavior (like notication sounds, etc) based on what your device allows."
-      default: Home Assistant Updates
+      default: {{ addon}} Updates
     color:
       name: Notification Color
       description: "You can set the color of the notification, you can use either the color name or the hex code."
@@ -40,7 +56,7 @@ blueprint:
         When you are setting the channel for your notification you also
         have the option to set the importance for the channel per notification. Possible
         values for this property are high, low, max, min and default.
-      default: high
+      default: default
     group:
       name: Notification Group
       description:
@@ -62,19 +78,24 @@ blueprint:
       name: Click Action
       description: "Clicking on the notification takes you where?"
       default: "https://my.home-assistant.io/redirect/supervisor/"
-    include_release_notes:
-      name: Include release notes
-      description: 'Add a "release notes" button to the notification'
-      selector:
-        boolean: {}
-      default: true
-    include_hasspodcast:
-      name: Include HassPodcast link
-      description: "Add a HassPodcast button to the notification"
+    replace:
+      name: Replacing Notif
+      description: "If this automation triggers more than once should we replace the existing notification for this add-on? Otherwise we'll just send a brand new one"
       selector:
         boolean: {}
       default: false
-  source_url: https://gist.github.com/fortepc/042c8b3e77cc2870d803e886cc895f34
+#    persistent: #Leaving Off because I'm not sure how to have a wat to remove the notif after I've made it persistent without requiring a seperate blueprint for that.
+#      name: Make Notification Persistent
+#      description: 'Persistent Notifications can't be swiped away'
+#      selector:
+#        boolean: {}
+#      default: false
+    sticky:
+      name: Make Notification Sticky
+      description: "Sticky Notifications don't automatically dismiss themselves when you click them"
+      selector:
+        boolean: {}
+      default: false
 
 trigger:
   platform: state
@@ -87,7 +108,10 @@ max_exceeded: silent
 
 variables:
   updater: !input "updater"
-  newest_version: "{{ states[updater].attributes.newest_version }}"
+  version_sensor: !input "version"
+  version: "{{ states[version_sensor] }}"
+  newest_version_sensor: !input "newest_version"
+  newest_version: "{{ states[newest_version_sensor] }}"
   release_notes: "{{ states[updater].attributes.release_notes }}"
   include_release_notes: !input "include_release_notes"
   include_hasspodcast: !input "include_hasspodcast"
@@ -98,10 +122,6 @@ variables:
   notify_device: !input "notify_device"
   notification_title: !input notification_title
   notification_message: !input notification_message
-  action_1_title: "{% if include_release_notes %}Release Notes{% endif %}"
-  action_1_uri: "{% if include_release_notes %}{{ release_notes }}{% endif %}"
-  action_2_title: "{% if include_hasspodcast %}HassPodcast{% endif %}"
-  action_2_uri: "{% if include_hasspodcast %}https://hasspodcast.io/episodes{% endif %}"
   clickAction: !input "clickAction"
 
 action:
