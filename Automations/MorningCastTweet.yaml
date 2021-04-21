@@ -1,0 +1,19 @@
+id: '1618848968838'
+alias: Morning Cast Report
+description: ''
+trigger:
+  - platform: sun
+    event: sunrise
+    offset: '-00:05:00'
+condition:
+  - condition: template
+    value_template: '{{ range(0,100) | random | int > 25 }}'
+action:
+  - service: notify.senary_mog_twitter
+    data:
+      message: >-
+        Good Morning! The sun will be up soon, and since last sunrise we have
+        watched {{ states('counter.number_of_plays') }} thing(s) on our
+        #ChromeCast devices https://www.home-assistant.io/integrations/cast/
+        #Cast #HomeAssistant #SmartHome
+mode: single
