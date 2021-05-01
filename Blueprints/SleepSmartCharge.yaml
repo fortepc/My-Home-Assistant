@@ -1,0 +1,48 @@
+blueprint:
+  name: Smarter Nighttime Charging
+  description: Charge Smarter! Prolong your battery longevity! Before adjusting the default values it's recomended to give this [Android Authority article](https://www.androidauthority.com/maximize-battery-life-882395/) a read to understand why the defaults are what they are!
+  domain: automation
+  input:
+    charger_switch:
+      name: Charger Switch
+      description: Which switch turns on/off your phone's charger?
+      selector:
+        entity:
+          domain: switch
+    batterylevel_sensor:
+      name: Battery Level Sensor
+      description: Which battery sensor belongs to the phone you want to track?
+      selector:
+        entity:
+          domain: sensor
+          device_class: battery
+    batterytemp_sensor:
+      name: Battery Temperature Sensor
+      description: Which temperature sensor belongs to the phone you want to track?
+      selector:
+        entity:
+          domain: sensor
+          device_class: temperature
+    bedtime:
+      name: Bed Time
+      description: What time should this automation kick in?
+      default: 21:00:00
+      selector:
+        time:
+    waketime:
+      name: Wake Time
+      description: When do you wake up? When should we shoot to finish charging?
+      default: 05:00:00
+      selector:
+        time:
+    floarpoint:
+      name: Float Point
+      description: What battery percentage should we target as the "Float Point" for the battery?
+    topofftime:
+      name: Top Off Time (Minutes)
+      description: How long does it take to charge your phone from the Float Point to being topped off. (In Minutes) We'll turn your charger on and leave it on this amount of time before your wake time.
+      default: 60
+    toohottemp:
+      name: To Hot to Charge Temp
+      description: What temperature is too hot to charge? (default is in °F, convert if needed based on your temp sensor)
+      default: 90
