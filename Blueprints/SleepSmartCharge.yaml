@@ -35,7 +35,7 @@ blueprint:
       default: 05:00:00
       selector:
         time:
-    floarpoint:
+    floatpoint:
       name: Float Point
       description: What battery percentage should we target as the "Float Point" for the battery?
     topofftime:
@@ -46,3 +46,42 @@ blueprint:
       name: To Hot to Charge Temp
       description: What temperature is too hot to charge? (default is in °F, convert if needed based on your temp sensor)
       default: 90
+
+mode: restart
+max_exceeded: silent
+
+trigger:
+  - platform: state
+    entity_id: !input batterylevel_sensor
+    above: !input floatpoint
+    for:
+      hours: 0
+      minutes: 1
+      seconds: 0
+      milliseconds: 0
+  - platform: state
+    entity_id: !input batterytemp_sensor
+    above: !input toohottemp
+
+condition:
+  - condition: and
+    conditions:
+      - type: is_plugged_in
+        condition: device
+        device_id: 20d852ebffa3e419967919b3f8bc2de4
+        entity_id: binary_sensor.fortephone_is_charging
+        domain: binary_sensor
+      - condition: time
+        after: !input bedtime
+        before: !input waketime
+action:
+  - service: switch.turn_off
+    target:
+      entity_id: switch.bedroom_freddycharger
+  - wait_for_trigger:
+      - platform: time
+        at: '06:00:00'
+    timeout: '02:00:00'
+  - service: switch.turn_on
+    target:
+      entity_id: switch.bedroom_freddycharger
