@@ -84,14 +84,14 @@ condition:
         state: 'on'
       - condition: time
         after: {{bedtime}}
-        before: { (as_timestamp(strptime(waketime, "%H:%M:%S")) - topuptime*60)|timestamp_custom("%H:%M:%S") }
+        before: "{{ (as_timestamp(strptime(waketime, "%H:%M:%S")) - topuptime*60)|timestamp_custom("%H:%M:%S") }}""
 action:
   - service: switch.turn_off
     target:
       entity_id: {{charger_switch}}
   - wait_for_trigger:
       - platform: time
-        at: {{ (as_timestamp(strptime(waketime, "%H:%M:%S")) - topuptime*60)|timestamp_custom("%H:%M:%S") }}
+        at: "{{ (as_timestamp(strptime(waketime, "%H:%M:%S")) - topuptime*60)|timestamp_custom("%H:%M:%S") }}"
     timeout: '02:00:00'
   - service: switch.turn_on
     target:
