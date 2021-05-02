@@ -5,7 +5,7 @@ blueprint:
   input:
     charger_switch:
       name: Charger Switch
-      description: "Which switch turns on/off your phone's charger?"
+      description: Which switch turns on/off your phone's charger?
       selector:
         entity:
           domain: switch
@@ -33,13 +33,13 @@ blueprint:
     bedtime:
       name: Bed Time
       description: What time should this automation kick in?
-      default: "21:00:00"
+      default: 21:00:00
       selector:
         time:
     waketime:
       name: Wake Time
       description: When do you wake up? When should we shoot to finish charging?
-      default: "05:00:00"
+      default: 05:00:00
       selector:
         time:
     floatpoint:
@@ -58,15 +58,8 @@ mode: restart
 max_exceeded: silent
 
 variables:
-  charger_switch: !input charger_switch
-  ischarging_sensor: !input ischarging_sensor
-  batterylevel_sensor: !input batterylevel_sensor
-  batterytemp_sensor: !input batterytemp_sensor
-  bedtime: !input bedtime
   waketime: !input waketime
-  floatpoint: !input floatpoint
   topofftime: !input topofftime
-  toohottemp: !input toohottemp
 
 trigger:
   - platform: numeric_state
