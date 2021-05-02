@@ -11,7 +11,7 @@ blueprint:
           domain: switch
     ischarging_sensor:
       name: Charging Sensor
-      description: placeholder
+      description: This is a placeholder
       selector:
         entity:
           domain: binary_sensor
