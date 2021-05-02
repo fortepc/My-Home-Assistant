@@ -70,30 +70,30 @@ variables:
 
 trigger:
   - platform: numeric_state
-    entity_id: {{batterylevel_sensor}}
-    above: {{floatpoint}}
+    entity_id: "{{batterylevel_sensor}}"
+    above: "{{floatpoint}}"
     for: '00:01:00'
   - platform: numeric_state
-    entity_id: {{batterytemp_sensor}}
-    above: {{toohottemp}}
+    entity_id: "{{batterytemp_sensor}}"
+    above: "{{toohottemp}}"
 condition:
   - condition: and
     conditions:
       - condition: state
-        entity_id: {{ischarging_sensor}}
+        entity_id: "{{ischarging_sensor}}"
         state: 'on'
       - condition: time
-        after: {{bedtime}}
+        after: "{{bedtime}}"
         before: "{{ (as_timestamp(strptime(waketime, '%H:%M:%S')) - 15*60 - topuptime*60)|timestamp_custom('%H:%M:%S') }}"
 action:
   - service: switch.turn_off
     target:
-      entity_id: {{charger_switch}}
+      entity_id: "{{charger_switch}}"
   - wait_for_trigger:
       - platform: time
         at: "{{ (as_timestamp(strptime(waketime, '%H:%M:%S')) - 15*60 - topuptime*60)|timestamp_custom('%H:%M:%S') }}"
     timeout: '02:00:00'
   - service: switch.turn_on
     target:
-      entity_id: {{charger_switch}}
+      entity_id: "{{charger_switch}}"
 mode: single
