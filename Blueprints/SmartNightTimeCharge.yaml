@@ -84,7 +84,7 @@ condition:
         state: 'on'
       - condition: time
         after: {{bedtime}}
-        before: {{ (as_timestamp(strptime(waketime, "%H:%M:%S")) - topuptime*60)|timestamp_custom("%H:%M:%S") }}
+        before: { (as_timestamp(strptime(waketime, "%H:%M:%S")) - topuptime*60)|timestamp_custom("%H:%M:%S") }
 action:
   - service: switch.turn_off
     target:
