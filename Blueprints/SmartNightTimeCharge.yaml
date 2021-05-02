@@ -9,6 +9,13 @@ blueprint:
       selector:
         entity:
           domain: switch
+    ischarging_sensor:
+      name: Charging Sensor
+      description: 
+      selector:
+        entity:
+          domain: binary_sensor
+          device_class: plug
     batterylevel_sensor:
       name: Battery Level Sensor
       description: Which battery sensor belongs to the phone you want to track?
@@ -50,38 +57,43 @@ blueprint:
 mode: restart
 max_exceeded: silent
 
-trigger:
-  - platform: state
-    entity_id: !input batterylevel_sensor
-    above: !input floatpoint
-    for:
-      hours: 0
-      minutes: 1
-      seconds: 0
-      milliseconds: 0
-  - platform: state
-    entity_id: !input batterytemp_sensor
-    above: !input toohottemp
+variables:
+  charger_switch: !input charger_switch
+  ischarging_sensor: !input ischarging_sensor
+  batterylevel_sensor: !input batterylevel_sensor
+  batterytemp_sensor: !input batterytemp_sensor
+  bedtime: !input bedtime
+  waketime: !input waketime
+  floatpoint: !input floatpoint
+  topofftime: !input topofftime
+  toohottemp: !input toohottemp
 
+trigger:
+  - platform: numeric_state
+    entity_id: {{batterylevel_sensor}}
+    above: {{floatpoint}}
+    for: '00:01:00'
+  - platform: numeric_state
+    entity_id: {{batterytemp_sensor}}
+    above: {{toohottemp}}
 condition:
   - condition: and
     conditions:
-      - type: is_plugged_in
-        condition: device
-        device_id: 20d852ebffa3e419967919b3f8bc2de4
-        entity_id: binary_sensor.fortephone_is_charging
-        domain: binary_sensor
+      - condition: state
+        entity_id: {{ischarging_sensor}}
+        state: 'on'
       - condition: time
-        after: !input bedtime
-        before: !input waketime
+        after: {{bedtime}}
+        before: {{ (as_timestamp(strptime(waketime, "%H:%M:%S")) - topuptime*60)|timestamp_custom("%H:%M:%S") }}
 action:
   - service: switch.turn_off
     target:
-      entity_id: switch.bedroom_freddycharger
+      entity_id: {{charger_switch}}
   - wait_for_trigger:
       - platform: time
-        at: '06:00:00'
+        at: {{ (as_timestamp(strptime(waketime, "%H:%M:%S")) - topuptime*60)|timestamp_custom("%H:%M:%S") }}
     timeout: '02:00:00'
   - service: switch.turn_on
     target:
-      entity_id: switch.bedroom_freddycharger
+      entity_id: {{charger_switch}}
+mode: single
