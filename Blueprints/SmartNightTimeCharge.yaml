@@ -70,12 +70,12 @@ variables:
 
 trigger:
   - platform: numeric_state
-    entity_id: "{{batterylevel_sensor}}"
-    above: "{{floatpoint}}"
+    entity_id: {{batterylevel_sensor}}
+    above: {{floatpoint}}
     for: '00:01:00'
   - platform: numeric_state
-    entity_id: "{{batterytemp_sensor}}"
-    above: "{{toohottemp}}"
+    entity_id: {{batterytemp_sensor}}
+    above: {{toohottemp}}
 condition:
   - condition: and
     conditions:
